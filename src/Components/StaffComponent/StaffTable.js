@@ -1,8 +1,7 @@
-
-import React, { useState, useEffect } from 'react';
-import { useLocation, withRouter } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -12,44 +11,23 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
-import {
-  Box,
-  Avatar,
-  TextField,
-  InputAdornment,
-  SvgIcon,
-  Menu,
-  MenuItem,Button
-} from "@material-ui/core";
+import { TextField, InputAdornment, SvgIcon, Button } from "@material-ui/core";
 import theme from "../../theme";
 import { withStyles } from "@material-ui/core/styles";
 import { Search as SearchIcon } from "react-feather";
-import { ToastContainer, toast } from "react-toastify";
-import DeleteOutlineOutlinedIcon from "@material-ui/icons/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
+import { toast } from "react-toastify";
 import firebase from "../../firebaseHandler";
-import {
-  getStaffs,
-  addStaff,
-  getStaff,
-  updateStaff,
-  deleteStaff,
-} from "../../data/staffData";
+import { getStaffs, addStaff, updateStaff } from "../../data/staffData";
 import StaffDialog from "./StaffDialog";
-const db = firebase.firestore()
+const db = firebase.firestore();
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -91,18 +69,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const {
-    classes,
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
+  const { onSelectAllClick, numSelected, rowCount } = props;
 
   return (
     <TableHead>
@@ -263,13 +230,14 @@ EnhancedTableToolbar.propTypes = {
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
-    marginTop:'20px'
+    marginTop: "20px",
   },
   paper: {
     width: "100%",
     marginBottom: theme.spacing(2),
     borderRadius: "16px",
-    boxShadow: "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px"
+    boxShadow:
+      "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px",
   },
   table: {
     minWidth: 750,
@@ -287,18 +255,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
- function EnhancedTable(props) {
+function EnhancedTable(props) {
   const { history } = props;
   const user = useSelector((state) => state.auth.userData);
   const loggedin = useSelector((state) => state.auth.loggedin);
-  const location = useLocation();
-  const params = location.state;
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [staffs, setStaffs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -311,19 +276,18 @@ const useStyles = makeStyles((theme) => ({
   const [gender, setGender] = useState("");
   const [department, setDepartment] = useState("");
   const [role, setRole] = useState("");
-  const [attendances, setAttendance] =  useState([]);
-  
 
   var myTimestamp = firebase.firestore.Timestamp.fromDate(new Date()).toDate();
   var today = myTimestamp;
-  const date = today.getDate() + "-" + today.getMonth() + "-" + today.getFullYear();
+  const date =
+    today.getDate() + "-" + today.getMonth() + "-" + today.getFullYear();
   const newDate = date.toString();
 
   const handleSetIn = (row) => {
     db.collection("attendance")
       .where("uid", "==", user.uid, "&&")
       .where("datePosted", "==", newDate)
-      .where("firstname","==",row.firstname)
+      .where("firstname", "==", row.firstname)
       .get()
       .then((querySnapshot) => {
         let attendance = [];
@@ -332,20 +296,17 @@ const useStyles = makeStyles((theme) => ({
           attendance.push(obj);
         });
         console.log("Got added attendance", attendance);
-        console.log(attendance)
-        if(attendance.length === 1){
-          toast.info('Attendance already given')
-        }
-        else {
+        console.log(attendance);
+        if (attendance.length === 1) {
+          toast.info("Attendance already given");
+        } else {
           history.push({
             pathname: "/setattendance",
-            state: { staffDetails: row }
+            state: { staffDetails: row },
           });
         }
       });
-
-      
-  }
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -368,7 +329,7 @@ const useStyles = makeStyles((theme) => ({
   const handleRole = (event) => {
     setRole(event.target.value);
   };
-  
+
   const getlist = async () => {
     try {
       setLoading(true);
@@ -376,23 +337,9 @@ const useStyles = makeStyles((theme) => ({
       setStaffs(list);
       setLoading(false);
     } catch (error) {
-     console.log(error.message);
+      console.log(error.message);
       setLoading(false);
     }
-  };
-
-  
-
-
-  const handleAdd = () => {
-    setOpen(true);
-    setFormMode(true);
-    setFirstName("");
-    setLastName("");
-    setPhoneNumber("");
-    setGender("");
-    setDepartment("");
-    setRole("");
   };
 
   const addStaffHandler = async () => {
@@ -439,7 +386,7 @@ const useStyles = makeStyles((theme) => ({
 
   const rows = staffs;
   console.log(rows);
-  
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -484,20 +431,13 @@ const useStyles = makeStyles((theme) => ({
     setPage(0);
   };
 
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-
-    useEffect(() => {
-      if (!loggedin) {
-          props.history.push("/");
-      }
-      }, [loggedin]);
+  useEffect(() => {
+    if (!loggedin) {
+      props.history.push("/");
+    }
+  }, [loggedin]);
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
@@ -506,7 +446,6 @@ const useStyles = makeStyles((theme) => ({
           <Table
             className={classes.table}
             aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
             aria-label="enhanced table"
           >
             <EnhancedTableHead
@@ -557,16 +496,26 @@ const useStyles = makeStyles((theme) => ({
                       >
                         {row.firstname} {row.lastname}
                       </TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>{row.department}</TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>{row.role}</TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>{row.gender}</TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>{row.phonenumber}</TableCell>
                       <TableCell style={{ borderBottom: "none" }}>
-
-                        <Button color="secondary" variant="contained" onClick={() => handleSetIn(row)}>
+                        {row.department}
+                      </TableCell>
+                      <TableCell style={{ borderBottom: "none" }}>
+                        {row.role}
+                      </TableCell>
+                      <TableCell style={{ borderBottom: "none" }}>
+                        {row.gender}
+                      </TableCell>
+                      <TableCell style={{ borderBottom: "none" }}>
+                        {row.phonenumber}
+                      </TableCell>
+                      <TableCell style={{ borderBottom: "none" }}>
+                        <Button
+                          color="secondary"
+                          variant="contained"
+                          onClick={() => handleSetIn(row)}
+                        >
                           Set In Time
                         </Button>
-                        
                       </TableCell>
                     </TableRow>
                   );
@@ -574,7 +523,7 @@ const useStyles = makeStyles((theme) => ({
             </TableBody>
           </Table>
           <StaffDialog
-            open={open} 
+            open={open}
             close={handleClose}
             formmode={formMode}
             firstname={firstname}

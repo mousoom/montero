@@ -1,11 +1,8 @@
-import {
-  Box,
-} from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 
 const AdminListToolbar = (props) => {
-  
   return (
     <Box {...props}>
       <Box
@@ -41,13 +38,12 @@ const AdminListToolbar = (props) => {
             aria-label="breadcrumb"
             style={{ lineHeight: "2", fontSize: "1rem" }}
           >
-            <Typography style={{color:'black'}}>Dashboard</Typography>
-            <Typography style={{color:'black'}}>Supervisor</Typography>
-            <Typography >Admin List</Typography>
+            <Typography style={{ color: "black" }}>Dashboard</Typography>
+            <Typography style={{ color: "black" }}>Supervisor</Typography>
+            <Typography>Admin List</Typography>
           </Breadcrumbs>
         </Box>
       </Box>
-
     </Box>
   );
 };

@@ -1,17 +1,6 @@
-import { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  InputAdornment,
-  SvgIcon,
-} from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import Link from "@material-ui/core/Link";
-import { ToastContainer, toast } from "react-toastify";
 
 const AttendanceToolbar = (props) => {
   const user = props.user;
@@ -52,7 +41,7 @@ const AttendanceToolbar = (props) => {
             style={{ lineHeight: "2", fontSize: "1rem" }}
           >
             <Typography>Dashboard</Typography>
-            {user.userType == "Admin" ? (
+            {user.userType === "Admin" ? (
               <Typography style={{ color: "black" }}>Admin</Typography>
             ) : (
               <Typography style={{ color: "black" }}>Supervisor</Typography>

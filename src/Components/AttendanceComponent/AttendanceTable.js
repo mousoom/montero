@@ -346,7 +346,7 @@ function EnhancedTable(props) {
   };
   useEffect(() => {
     getAttendanceAdded();
-  },[]);
+  }, []);
   console.log(attendances);
   const rows = attendances;
 
@@ -400,7 +400,7 @@ function EnhancedTable(props) {
     if (!loggedin) {
       props.history.push("/");
     }
-  },[]);
+  }, []);
   return (
     <div className={classes.root}>
       {rows && rows.length > 0 ? (

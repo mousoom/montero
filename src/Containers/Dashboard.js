@@ -5,8 +5,7 @@ import { useSelector } from "react-redux";
 import firebase from "../firebaseHandler";
 import Basic from "../Components/charts/Basic";
 import Line from "../Components/charts/Line";
-import moment from "moment";
-const Moment = require('moment')
+
 const db = firebase.firestore();
 
 const Dashboard = (props) => {
@@ -15,7 +14,6 @@ const Dashboard = (props) => {
   // const [orgcourses, setOrgCourses] = useState([]);
   const [staffs, setStaffs] = useState([]);
   const [attendances, setAttendance] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   // const handleSearch = (e) => {
   //   let query = e.target.value;
@@ -53,12 +51,6 @@ const Dashboard = (props) => {
       });
   };
 
-  var myTimestamp = firebase.firestore.Timestamp.fromDate(new Date()).toDate();
-  var today = myTimestamp;
-  const date =
-    today.getDate() + "-" + today.getMonth() + "-" + today.getFullYear();
-  const newDate = date.toString();
-
   const getAttendanceAdded = () => {
     db.collection("attendance")
       .get()
@@ -78,7 +70,7 @@ const Dashboard = (props) => {
   useEffect(() => {
     getAllStaffs();
     getAttendanceAdded();
-  },[]);
+  }, []);
 
   var female = staffs.filter((x) => x.gender === "Female");
   var male = staffs.filter((x) => x.gender === "Male");
@@ -93,73 +85,66 @@ const Dashboard = (props) => {
 
   var findDate = [];
   attendances.forEach((item) => {
-    findDate.push(item.datePosted)
-  })
-  console.log(findDate)
-  
+    findDate.push(item.datePosted);
+  });
+  console.log(findDate);
+
   // remove duplicate dates in array
   function removeDuplicate(data) {
     return [...new Set(data)];
   }
   var mapDate = removeDuplicate(findDate);
-  console.log(mapDate)
+  console.log(mapDate);
 
   // sort date
-  var sortdate = mapDate.sort(function(a, b){
-    var aa = a.split('-').reverse().join(),
-        bb = b.split('-').reverse().join();
-    return aa < bb ? -1 : (aa > bb ? 1 : 0);
-});
+  var sortdate = mapDate.sort(function (a, b) {
+    var aa = a.split("-").reverse().join(),
+      bb = b.split("-").reverse().join();
+    return aa < bb ? -1 : aa > bb ? 1 : 0;
+  });
 
-console.log(sortdate)
-  
-  
-  
+  console.log(sortdate);
 
   // var fun = "03-11-2014";
   // var newdate = fun.split("-").reverse().join("-");
-  
-  let newtrydate = [];// total present staff in particular date
+
+  let newtrydate = []; // total present staff in particular date
   sortdate.forEach(function (doc, i) {
     var newdate = doc.split("-").reverse().join("-");
     newtrydate.push(newdate);
   });
-  
+
   // total present staff
   var present = attendances.filter((x) => x.status === "Present");
-// console.log(present)
+  // console.log(present)
 
-
-  let newpresent = [];// total present staff in particular date
+  let newpresent = []; // total present staff in particular date
   sortdate.forEach(function (doc, i) {
     var setpresent = present.filter((x) => x.datePosted === doc);
     newpresent.push(setpresent.length);
   });
 
-
   // total absent staff
   var absent = attendances.filter((x) => x.status === "Absent");
-  let newabsent = [];// total absent staff in particular date
+  let newabsent = []; // total absent staff in particular date
   sortdate.forEach(function (doc, i) {
     var setabsent = absent.filter((x) => x.datePosted === doc);
     newabsent.push(setabsent.length);
   });
 
-
   // total leave staff
   var leave = attendances.filter((x) => x.status === "Leave");
-  let newleave = [];// total leave staff in particular date
+  let newleave = []; // total leave staff in particular date
   sortdate.forEach(function (doc, i) {
     var setleave = leave.filter((x) => x.datePosted === doc);
     newleave.push(setleave.length);
   });
 
-
   useEffect(() => {
     if (!loggedin) {
       props.history.push("/");
     }
-  },[]);
+  }, []);
 
   return (
     <div
@@ -171,8 +156,8 @@ console.log(sortdate)
       }}
     >
       {user && user.userType === "Supervisor" ? (
-        <div>
-          <Grid xs={12} container spacing={3}>
+        <>
+          <Grid container spacing={3}>
             <Typography
               variant="h4"
               style={{ width: "100%", padding: "20px 0px 20px 10px" }}
@@ -276,59 +261,60 @@ console.log(sortdate)
               </Paper>
             </Grid>
           </Grid>
-          <Grid container xs={12} spacing={3} >
+          <Grid container spacing={3}>
             <Grid item xs={3}>
               <Paper
-                  style={{
-                    padding: "20px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: "column",
-                    borderRadius: "16px",
-                    boxShadow:
+                style={{
+                  padding: "20px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  borderRadius: "16px",
+                  boxShadow:
                     "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px",
-                  }}
-                  >
-                  <h2>Staffs by Gender</h2>
-                  {staffLength && maleLength && femaleLength ?
+                }}
+              >
+                <h2>Staffs by Gender</h2>
+                {staffLength && maleLength && femaleLength ? (
                   <Basic
                     female={femaleLength}
                     male={maleLength}
                     staff={staffLength}
-                    />
-                    :
-                    <h3>Data Loading ...</h3>
-                    }
-                </Paper>
+                  />
+                ) : (
+                  <h3>Data Loading ...</h3>
+                )}
+              </Paper>
             </Grid>
             <Grid item xs={9}>
               <Paper
-                  style={{
-                    padding: "20px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: "column",
-                    borderRadius: "16px",
-                    boxShadow:
-                      "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px",
-                  }}
-                >
-                  <h2>Attendances by Date</h2>
-                  {sortdate && newpresent && newabsent && newleave ? 
-                  <Line newtrydate={sortdate} newpresent={newpresent} newabsent={newabsent} newleave={newleave}/>
-                  : 
+                style={{
+                  padding: "20px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  borderRadius: "16px",
+                  boxShadow:
+                    "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px",
+                }}
+              >
+                <h2>Attendances by Date</h2>
+                {sortdate && newpresent && newabsent && newleave ? (
+                  <Line
+                    newtrydate={sortdate}
+                    newpresent={newpresent}
+                    newabsent={newabsent}
+                    newleave={newleave}
+                  />
+                ) : (
                   <h3>Data Loading ...</h3>
-                  }
-                  
-                </Paper>
+                )}
+              </Paper>
             </Grid>
-                
-              
-                
           </Grid>
-        </div>
+        </>
       ) : (
         <Redirect to="/staff" />
       )}

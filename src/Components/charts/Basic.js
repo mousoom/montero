@@ -1,16 +1,15 @@
-import React, { Component } from 'react';
-import Chart from 'react-apexcharts'
+import React, { Component } from "react";
+import Chart from "react-apexcharts";
 
 class RadialBar extends Component {
-
   constructor(props) {
     super(props);
-    
-    var staff = props.staff
-    var female = props.female
-    var male = props.male
-    console.log(staff)
-    this.state = {  
+
+    var staff = props.staff;
+    var female = props.female;
+    var male = props.male;
+    console.log(staff);
+    this.state = {
       options: {
         stroke: {
           lineCap: "round",
@@ -19,25 +18,25 @@ class RadialBar extends Component {
           show: true,
           position: "bottom",
           containerMargin: {
-            top: 30
-          }
+            top: 30,
+          },
         },
         fill: {
-          colors: ['#00ab55', '#6659ff']
+          colors: ["#00ab55", "#6659ff"],
         },
-        labels: ['Male','Female'],
-        
+        labels: ["Male", "Female"],
+
         plotOptions: {
           radialBar: {
             hollow: {
               margin: 15,
               size: "70%",
             },
-    
+
             dataLabels: {
               name: {
                 color: "#333",
-                fontSize: "20px"
+                fontSize: "20px",
               },
               value: {
                 color: "#111",
@@ -45,26 +44,31 @@ class RadialBar extends Component {
               },
               total: {
                 show: true,
-                label: 'Total Staffs',
+                label: "Total Staffs",
                 color: "#888",
                 fontSize: "15px",
                 formatter: function (val) {
-                  return staff
-                }
-              }
-            }
+                  return staff;
+                },
+              },
+            },
           },
         },
       },
-      series: [male,female],
-    }
+      series: [male, female],
+    };
   }
 
   render() {
-
     return (
       <div className="radialbar">
-        <Chart options={this.state.options} series={this.state.series} legend={this.state.legend} type="radialBar" width="300" />
+        <Chart
+          options={this.state.options}
+          series={this.state.series}
+          legend={this.state.legend}
+          type="radialBar"
+          width="300"
+        />
       </div>
     );
   }

@@ -1,20 +1,8 @@
-import { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  InputAdornment,
-  SvgIcon,
-} from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import Link from "@material-ui/core/Link";
-import { ToastContainer, toast } from "react-toastify";
 
 const AttendanceToolbar = (props) => {
-  
   return (
     <Box {...props}>
       <Box
@@ -49,13 +37,13 @@ const AttendanceToolbar = (props) => {
             }
             aria-label="breadcrumb"
             style={{ lineHeight: "2", fontSize: "1rem" }}
-          ><Typography style={{ color: "black" }}>Dashboard</Typography>
+          >
+            <Typography style={{ color: "black" }}>Dashboard</Typography>
             <Typography style={{ color: "black" }}>Admin</Typography>
             <Typography color="inherit">Attendance List</Typography>
           </Breadcrumbs>
         </Box>
       </Box>
-
     </Box>
   );
 };

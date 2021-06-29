@@ -1,5 +1,5 @@
 import React from "react";
-import {withRouter, Redirect } from "react-router-dom";
+import { withRouter, Redirect } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -10,7 +10,6 @@ import {
 } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import ProfileToolbar from "./ProfileToolbar";
-
 
 const Profile = (props) => {
   const { history } = props;

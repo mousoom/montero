@@ -35,7 +35,6 @@ import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
-
 import {
   getUsers,
   addUser,
@@ -44,7 +43,6 @@ import {
   deleteUser,
 } from "../../data/adminData";
 import AdminDialog from "./AdminDialog";
-
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -84,10 +82,8 @@ const headCells = [
 
 function EnhancedTableHead(props) {
   const {
-  
     onSelectAllClick,
 
-  
     numSelected,
     rowCount,
   } = props;
@@ -251,13 +247,14 @@ EnhancedTableToolbar.propTypes = {
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
-    marginTop:'20px'
+    marginTop: "20px",
   },
   paper: {
     width: "100%",
     marginBottom: theme.spacing(2),
     borderRadius: "16px",
-    boxShadow: "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px"
+    boxShadow:
+      "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px",
   },
   table: {
     minWidth: 750,
@@ -340,7 +337,7 @@ export default function EnhancedTable() {
       getlist();
       toast.success("Admin Deleted Successfully");
     } catch (error) {
-     console.log(error.message);
+      console.log(error.message);
     }
   };
 
@@ -372,7 +369,7 @@ export default function EnhancedTable() {
         setDepartment("");
       }
     } catch (error) {
-    console.log(error.message);
+      console.log(error.message);
     }
   };
 
@@ -427,7 +424,6 @@ export default function EnhancedTable() {
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
 
   return (
     <div className={classes.root}>
@@ -487,9 +483,15 @@ export default function EnhancedTable() {
                       >
                         {row.username}
                       </TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>{row.department}</TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>{row.email}</TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>{row.userType}</TableCell>
+                      <TableCell style={{ borderBottom: "none" }}>
+                        {row.department}
+                      </TableCell>
+                      <TableCell style={{ borderBottom: "none" }}>
+                        {row.email}
+                      </TableCell>
+                      <TableCell style={{ borderBottom: "none" }}>
+                        {row.userType}
+                      </TableCell>
                       <TableCell
                         style={{
                           borderBottom: "none",
@@ -525,7 +527,14 @@ export default function EnhancedTable() {
                                     style={{ width: "100%", display: "flex" }}
                                   >
                                     <DeleteOutlineOutlinedIcon />
-                                    <Typography style={{marginLeft:'10px',fontSize:'16px'}}>Delete</Typography>
+                                    <Typography
+                                      style={{
+                                        marginLeft: "10px",
+                                        fontSize: "16px",
+                                      }}
+                                    >
+                                      Delete
+                                    </Typography>
                                   </Box>
                                 </MenuItem>
                                 <MenuItem onClick={popupState.close}>
@@ -534,7 +543,14 @@ export default function EnhancedTable() {
                                     style={{ width: "100%", display: "flex" }}
                                   >
                                     <EditOutlinedIcon />
-                                    <Typography style={{marginLeft:'10px',fontSize:'16px'}}>Edit</Typography>
+                                    <Typography
+                                      style={{
+                                        marginLeft: "10px",
+                                        fontSize: "16px",
+                                      }}
+                                    >
+                                      Edit
+                                    </Typography>
                                   </Box>
                                 </MenuItem>
                               </Menu>
@@ -548,7 +564,7 @@ export default function EnhancedTable() {
             </TableBody>
           </Table>
           <AdminDialog
-            open={open} 
+            open={open}
             close={handleClose}
             formmode={formMode}
             username={username}

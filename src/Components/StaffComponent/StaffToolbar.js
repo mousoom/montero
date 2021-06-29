@@ -1,39 +1,14 @@
-import { useState, useEffect } from "react";
-import { useLocation, withRouter, Redirect } from 'react-router-dom';
-import { useSelector, useDispatch } from "react-redux";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  InputAdornment,
-  SvgIcon,
-} from "@material-ui/core";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { Box, Button } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import Link from "@material-ui/core/Link";
-import { ToastContainer, toast } from "react-toastify";
-import {
-  getStaffs,
-  addStaff,
-  getStaff,
-  updateStaff,
-  deleteStaff,
-} from "../../data/staffData";
+import { toast } from "react-toastify";
+import { getStaffs, addStaff, updateStaff } from "../../data/staffData";
 import StaffDialog from "./StaffDialog";
 
-function handleClick(event) {
-  event.preventDefault();
-  console.info("You clicked a breadcrumb.");
-}
-
 const StaffListToolbar = (props) => {
-  const { history } = props;
-    const location = useLocation();
-    const params = location.state;
-    const user = useSelector((state) => state.auth.userData);
-    const loggedin = useSelector((state) => state.auth.loggedin);
+  const user = useSelector((state) => state.auth.userData);
   const [staffs, setStaffs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -45,8 +20,6 @@ const StaffListToolbar = (props) => {
   const [gender, setGender] = useState("");
   const [department, setDepartment] = useState("");
   const [role, setRole] = useState("");
-  const [adminName, setAdminName] = useState("");
-  const [adminEmail, setAdminEmail] = useState("");
 
   const handleClose = () => {
     setOpen(false);
@@ -101,8 +74,8 @@ const StaffListToolbar = (props) => {
         gender,
         department,
         role,
-        adminName:user.username,
-        adminEmail:user.email
+        adminName: user.username,
+        adminEmail: user.email,
       };
       if (formMode) {
         await addStaff(staff);
@@ -166,27 +139,29 @@ const StaffListToolbar = (props) => {
             aria-label="breadcrumb"
             style={{ lineHeight: "2", fontSize: "1rem" }}
           >
-            <Typography style={{color:'black'}}>Dashboard</Typography>
-            {user.userType == "Admin" ? 
-            <Typography style={{color:'black'}}>Admin</Typography>
-            :
-            <Typography style={{color:'black'}}>Supervisor</Typography>
-          }
-            
-           
+            <Typography style={{ color: "black" }}>Dashboard</Typography>
+            {user.userType === "Admin" ? (
+              <Typography style={{ color: "black" }}>Admin</Typography>
+            ) : (
+              <Typography style={{ color: "black" }}>Supervisor</Typography>
+            )}
+
             <Typography color="inherit">Staff List</Typography>
           </Breadcrumbs>
         </Box>
-        {user.userType == "Supervisor"? 
-        <Box sx={{ display: "flex" }}>
-          <Button color="primary" variant="contained" onClick={handleAdd} style={{boxShadow:'rgba(0, 171, 85, 0.24) 0px 8px 16px 0px'}}>
-           <span style={{fontSize:'20px',marginRight:'10px'}}>+</span>Add Staff
-          </Button>
-        </Box>
-        : 
-        null
-}
-        
+        {user.userType === "Supervisor" ? (
+          <Box sx={{ display: "flex" }}>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={handleAdd}
+              style={{ boxShadow: "rgba(0, 171, 85, 0.24) 0px 8px 16px 0px" }}
+            >
+              <span style={{ fontSize: "20px", marginRight: "10px" }}>+</span>
+              Add Staff
+            </Button>
+          </Box>
+        ) : null}
       </Box>
       <StaffDialog
         open={open}

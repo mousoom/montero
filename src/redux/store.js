@@ -1,8 +1,8 @@
-import { createStore, combineReducers } from 'redux';
+import { createStore, combineReducers } from "redux";
 import users from "./userDataReducer";
 
 const reducer = combineReducers({
-    auth: users
+  auth: users,
 });
 
 const store = createStore(reducer);

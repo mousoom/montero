@@ -1,20 +1,8 @@
-import { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  InputAdornment,
-  SvgIcon,
-} from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import Link from "@material-ui/core/Link";
-import { ToastContainer, toast } from "react-toastify";
 
 const GiveAttendanceToolbar = (props) => {
-  
   return (
     <Box {...props}>
       <Box
@@ -56,7 +44,6 @@ const GiveAttendanceToolbar = (props) => {
           </Breadcrumbs>
         </Box>
       </Box>
-
     </Box>
   );
 };
