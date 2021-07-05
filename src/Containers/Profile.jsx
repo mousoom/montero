@@ -11,6 +11,7 @@ import {
 import { useSelector } from "react-redux";
 import ProfileToolbar from "./ProfileToolbar";
 
+
 const Profile = (props) => {
   const { history } = props;
   const user = useSelector((state) => state.auth.userData);
@@ -72,7 +73,7 @@ const Profile = (props) => {
               >
                 {user.email}
               </Typography>
-              {user.userType === "Admin" ? (
+
                 <Typography
                   variant="body1"
                   style={{
@@ -84,32 +85,9 @@ const Profile = (props) => {
                   <span style={{ fontSize: "20px" }}>
                     <strong>{user.userType}</strong> of{" "}
                   </span>
-                  {user.department}
+                  CSE
                   <span style={{ fontSize: "20px" }}> Department</span>
                 </Typography>
-              ) : (
-                <>
-                  <Typography
-                    variant="body1"
-                    style={{
-                      fontSize: "25px",
-                      textTransform: "uppercase",
-                      letterSpacing: "3px",
-                    }}
-                  >
-                    {user.userType}
-                  </Typography>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="primary"
-                    style={{ marginTop: 20 }}
-                    onClick={() => history.push("/changeUsertype")}
-                  >
-                    Change
-                  </Button>
-                </>
-              )}
             </CardContent>
           </Card>
         </Container>

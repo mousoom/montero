@@ -1,14 +1,12 @@
 const firebaseConfig = {
-    //Your firebase configuratrion here.
-    apiKey: "AIzaSyD0Tqm6RigCq58F2N1cKr5I0HPEd9TXp_4",
-    authDomain: "staff-2e524.firebaseapp.com",
-    databaseURL: "https://staff-2e524-default-rtdb.firebaseio.com",
-    projectId: "staff-2e524",
-    storageBucket: "staff-2e524.appspot.com",
-    messagingSenderId: "806774031180",
-    appId: "1:806774031180:web:3d558910764dbd9d4c85e9",
-    measurementId: "G-VNK55PVXT1"
-};
+    apiKey: "AIzaSyDKCIf4OLmyiLv4LVlcGr__Q-uEnY26A4I",
+    authDomain: "resource-12700.firebaseapp.com",
+    projectId: "resource-12700",
+    storageBucket: "resource-12700.appspot.com",
+    messagingSenderId: "749470510556",
+    appId: "1:749470510556:web:628ded3f2ead3e2ccd7319",
+    measurementId: "G-LMB0CSH08T"
+  };
 
 export {
     firebaseConfig

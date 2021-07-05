@@ -35,14 +35,9 @@ import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
-import {
-  getUsers,
-  addUser,
-  getUser,
-  updateUser,
-  deleteUser,
-} from "../../data/adminData";
-import AdminDialog from "./AdminDialog";
+import firebase from "../../firebaseHandler";
+const db = firebase.firestore();
+
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -72,12 +67,7 @@ function stableSort(array, comparator) {
 
 const headCells = [
   { id: "name", label: "Name" },
-  {
-    id: "department",
-    label: "Department",
-  },
   { id: "email", label: "Email" },
-  { id: "type", label: "User Type" },
 ];
 
 function EnhancedTableHead(props) {
@@ -127,7 +117,9 @@ function EnhancedTableHead(props) {
             paddingRight: "24px",
             boxShadow: "#fff -8px 0px 0px inset",
           }}
-        />
+        >
+          User Type
+        </TableCell>
       </TableRow>
     </TableHead>
   );
@@ -218,7 +210,7 @@ const EnhancedTableToolbar = (props) => {
               </InputAdornment>
             ),
           }}
-          placeholder="Search Admins"
+          placeholder="Search Users"
           variant="outlined"
         />
       )}
@@ -279,106 +271,9 @@ export default function EnhancedTable() {
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [formMode, setFormMode] = useState(true);
-  const [userId, setUserId] = useState("");
-  const [username, setUsername] = useState("");
-  const [userType, setUserType] = useState("");
-  const [email, setEmail] = useState("");
-  const [department, setDepartment] = useState("");
+  const [users, setUser] = useState([]);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleUsername = (event) => {
-    setUsername(event.target.value);
-  };
-
-  const handleUserType = (event) => {
-    setUserType(event.target.value);
-  };
-  const handleEmail = (event) => {
-    setEmail(event.target.value);
-  };
-  const handleDepartment = (event) => {
-    setDepartment(event.target.value);
-  };
-
-  const getlist = async () => {
-    try {
-      setLoading(true);
-      const list = await getUsers();
-      setUsers(list);
-      setLoading(false);
-    } catch (error) {
-      console.log(error.message);
-      setLoading(false);
-    }
-  };
-  const getOneUser = async (id) => {
-    try {
-      setFormMode(false);
-      setUserId(id);
-      const response = await getUser(id);
-      setUsername(response.username);
-      setUserType(response.userType);
-      setEmail(response.email);
-      setDepartment(response.department);
-      setOpen(true);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-  const deleteHandler = async (id) => {
-    try {
-      await deleteUser(id);
-      getlist();
-      toast.success("Admin Deleted Successfully");
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const addUserHandler = async () => {
-    try {
-      const user = {
-        username,
-        userType,
-        email,
-        department,
-      };
-      if (formMode) {
-        await addUser(user);
-        toast.success("Admin Added Successfully");
-        getlist();
-        setOpen(false);
-        setUsername("");
-        setUserType("");
-        setEmail("");
-        setDepartment("");
-      } else {
-        await updateUser(userId, user);
-        toast.success("Admin Updated Successfully");
-        getlist();
-        setOpen(false);
-        setUsername("");
-        setUserType("");
-        setEmail("");
-        setDepartment("");
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  useEffect(() => {
-    getlist();
-  }, []);
-
-  const rows = users;
-  console.log(rows);
+  
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -424,6 +319,30 @@ export default function EnhancedTable() {
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
+  
+  const getUserAdded = () => {
+    db.collection("users")
+    .where("userType",'not-in',["Admin","HOD"])
+      .get()
+      .then((querySnapshot) => {
+        let user = [];
+        querySnapshot.forEach((doc) => {
+          let obj = doc.data();
+          obj.id = doc.id;
+          user.push(obj);
+        });
+        console.log("Got added user", user);
+        setUser(user);
+      })
+      .catch((error) => {
+        console.log("Error getting added user: ", error);
+      });
+  };
+  useEffect(() => {
+    getUserAdded()
+  }, []);
+  console.log(users);
+  const rows = users
 
   return (
     <div className={classes.root}>
@@ -484,99 +403,17 @@ export default function EnhancedTable() {
                         {row.username}
                       </TableCell>
                       <TableCell style={{ borderBottom: "none" }}>
-                        {row.department}
-                      </TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>
                         {row.email}
                       </TableCell>
                       <TableCell style={{ borderBottom: "none" }}>
                         {row.userType}
                       </TableCell>
-                      <TableCell
-                        style={{
-                          borderBottom: "none",
-                          paddingRight: "24px",
-                          textAlign: "right",
-                        }}
-                      >
-                        <PopupState variant="popover" popupId="demo-popup-menu">
-                          {(popupState) => (
-                            <React.Fragment>
-                              <IconButton
-                                variant="outlined"
-                                {...bindTrigger(popupState)}
-                              >
-                                <MoreVertIcon />
-                              </IconButton>
-                              <Menu
-                                style={{
-                                  position: "absolute",
-                                  left: " -50px",
-                                }}
-                                PaperProps={{
-                                  style: {
-                                    width: "200px",
-                                    minHeight: "16px",
-                                  },
-                                }}
-                                {...bindMenu(popupState)}
-                              >
-                                <MenuItem onClick={popupState.close}>
-                                  <Box
-                                    onClick={() => deleteHandler(row.id)}
-                                    style={{ width: "100%", display: "flex" }}
-                                  >
-                                    <DeleteOutlineOutlinedIcon />
-                                    <Typography
-                                      style={{
-                                        marginLeft: "10px",
-                                        fontSize: "16px",
-                                      }}
-                                    >
-                                      Delete
-                                    </Typography>
-                                  </Box>
-                                </MenuItem>
-                                <MenuItem onClick={popupState.close}>
-                                  <Box
-                                    onClick={() => getOneUser(row.id)}
-                                    style={{ width: "100%", display: "flex" }}
-                                  >
-                                    <EditOutlinedIcon />
-                                    <Typography
-                                      style={{
-                                        marginLeft: "10px",
-                                        fontSize: "16px",
-                                      }}
-                                    >
-                                      Edit
-                                    </Typography>
-                                  </Box>
-                                </MenuItem>
-                              </Menu>
-                            </React.Fragment>
-                          )}
-                        </PopupState>
-                      </TableCell>
+                     
                     </TableRow>
                   );
                 })}
             </TableBody>
           </Table>
-          <AdminDialog
-            open={open}
-            close={handleClose}
-            formmode={formMode}
-            username={username}
-            email={email}
-            userType={userType}
-            department={department}
-            changeUsername={handleUsername}
-            changeEmail={handleEmail}
-            changeUserType={handleUserType}
-            changeDepartment={handleDepartment}
-            addUser={addUserHandler}
-          />
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}

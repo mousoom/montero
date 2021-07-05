@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Drawer from "@material-ui/core/Drawer";
@@ -18,24 +19,22 @@ import { saveUserData, setAuth } from "../redux/actions";
 import { Route, Switch, withRouter } from "react-router-dom";
 import firebase from "../firebaseHandler";
 import Landing from "../Containers/Landing";
-import Dashboard from "../Containers/Dashboard";
 import UserType from "./UserType";
 import Profile from "../Containers/Profile";
-import Staff from "../Containers/Staff";
-import Admin from "../Containers/Admin";
 import HomeIcon from "@material-ui/icons/Home";
-import Attendance from "../Containers/Attendance";
-import AttendanceDialog from "../Components/AttendanceComponent/AttendanceDialog";
 import NavItem from "./NavItem";
 import {
-  BarChart as BarChartIcon,
   User as UserIcon,
-  UserPlus as UserPlusIcon,
   Users as UsersIcon,
+  CheckSquare as CheckIcon,
 } from "react-feather";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import Logo from "../logo/logo.png";
 import { toast } from "react-toastify";
+import Category from "../Containers/Category";
+import AddCategory from "./CategoryComponent/AddCategory";
+import Resource from "../Containers/Resource"
+import AddResource from "./ResourceComponent/AddResource";
+import Users from "../Containers/Users"
 
 const drawerWidth = 280;
 
@@ -103,19 +102,9 @@ function ResponsiveDrawer(props) {
 
   const items = [
     {
-      href: "/dashboard",
-      icon: BarChartIcon,
-      title: "Dashboard",
-    },
-    {
-      href: "/admin",
-      icon: UserPlusIcon,
-      title: "Admins",
-    },
-    {
-      href: "/staff",
-      icon: UsersIcon,
-      title: "Staffs",
+      href: "/resource",
+      icon: CheckIcon,
+      title: "Resource",
     },
     {
       href: "/profile",
@@ -140,8 +129,8 @@ function ResponsiveDrawer(props) {
           backgroundColor: "#f2f3f5",
         },
         "&.active": {
-          color: "rgb(0, 171, 85)",
-          backgroundColor: "rgba(0, 171, 85, 0.08)",
+          color: "rgb(106, 56, 255)",
+          backgroundColor: "rgba(106, 56, 255, 0.08)",
           "&:before": {
             position: "absolute",
             content: '""',
@@ -150,7 +139,7 @@ function ResponsiveDrawer(props) {
             right: 0,
             width: "3px",
             borderRadius: "4px 0px 0px 4px",
-            background: "#00ab55",
+            background: "rgb(106, 56, 255)",
           },
         },
       },
@@ -184,9 +173,42 @@ function ResponsiveDrawer(props) {
           >
             <MenuIcon />
           </IconButton>
-          <IconButton style={{ position: "fixed", right: "20px" }}>
+          <div style={{ position: "fixed", right: "20px",display:'flex',alignItems:'center' }}>
+          {user && (
+                <Box
+                  style={{
+                    alignItems: "center",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    padding: "16px 20px",
+                    borderRadius: "10px",
+                    color: "black",
+                  }}
+                >
+                  
+                  <div>
+                    <Typography
+                      style={{ fontWeight: "600", fontSize: "0.875rem" }}
+                    >
+                      {user.username}
+                    </Typography>
+                  </div>
+                  <Avatar
+                    style={{
+                      cursor: "pointer",
+                      width: 40,
+                      height: 40,
+                      marginLeft: "10px",
+                    }}
+                  />
+                </Box>
+              )}
+          <IconButton>
             <ExitToAppIcon onClick={singOutUser} />
           </IconButton>
+          </div>
+
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label="mailbox folders">
@@ -214,60 +236,18 @@ function ResponsiveDrawer(props) {
                   padding: "0px 0px 0px 25px",
                 }}
               >
-                <img src={Logo} style={{ width: "55px" }} alt="logo" />
-                <Typography
+                 <Typography
                   style={{
-                    fontFamily: "Comfortaa",
                     fontWeight: "700",
                     fontSize: "20px",
                     paddingLeft: "5px",
-                    color: "#00ab55",
+                    color: "rgb(106, 56, 255)",
                   }}
                 >
-                  montero
+                  RMS
                 </Typography>
               </div>
-              {user && (
-                <Box
-                  style={{
-                    alignItems: "center",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-around",
-                    padding: "16px 20px",
-                    background: "rgba(145, 158, 171, 0.12)",
-                    margin: "35px 30px 30px 30px",
-                    borderRadius: "10px",
-                    color: "black",
-                  }}
-                >
-                  <Avatar
-                    style={{
-                      cursor: "pointer",
-                      width: 40,
-                      height: 40,
-                      marginRight: "10px",
-                    }}
-                  />
-                  <div>
-                    <Typography
-                      style={{ fontWeight: "600", fontSize: "0.875rem" }}
-                    >
-                      {user.username}
-                    </Typography>
-                    <Typography
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "400",
-                        textTransform: "lowercase",
-                      }}
-                    >
-                      {user.userType}
-                    </Typography>
-                  </div>
-                </Box>
-              )}
-
+             
               {loggedin ? (
                 <List>
                   {items.map((item) => (
@@ -313,59 +293,18 @@ function ResponsiveDrawer(props) {
                   padding: "0px 0px 0px 25px",
                 }}
               >
-                <img src={Logo} style={{ width: "55px" }} alt="logo" />
                 <Typography
                   style={{
-                    fontFamily: "Comfortaa",
                     fontWeight: "700",
                     fontSize: "20px",
                     paddingLeft: "5px",
-                    color: "#00ab55",
+                    color: "rgb(106, 56, 255)",
                   }}
                 >
-                  montero
+                  RMS
                 </Typography>
               </div>
-              {user && (
-                <Box
-                  style={{
-                    alignItems: "center",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-around",
-                    padding: "16px 20px",
-                    background: "rgba(145, 158, 171, 0.12)",
-                    margin: "35px 30px 30px 30px",
-                    borderRadius: "10px",
-                    color: "black",
-                  }}
-                >
-                  <Avatar
-                    style={{
-                      cursor: "pointer",
-                      width: 40,
-                      height: 40,
-                      marginRight: "10px",
-                    }}
-                  />
-                  <div>
-                    <Typography
-                      style={{ fontWeight: "600", fontSize: "0.875rem" }}
-                    >
-                      {user.username}
-                    </Typography>
-                    <Typography
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "400",
-                        textTransform: "lowercase",
-                      }}
-                    >
-                      {user.userType}
-                    </Typography>
-                  </div>
-                </Box>
-              )}
+              
               {loggedin ? (
                 <List>
                   {items.map((item) => (
@@ -405,10 +344,38 @@ function ResponsiveDrawer(props) {
             )}
           />
           <Route
-            path="/dashboard"
+            path="/users"
             exact
             render={() => (
-              <Dashboard loading={loading} loggedin={loggedin} user={user} />
+              <Users loading={loading} loggedin={loggedin} user={user} />
+            )}
+          />
+          <Route
+            path="/category"
+            exact
+            render={() => (
+              <Category loading={loading} loggedin={loggedin} user={user} />
+            )}
+          />
+           <Route
+            path="/addcategory"
+            exact
+            render={() => (
+              <AddCategory loading={loading} loggedin={loggedin} user={user} />
+            )}
+          />
+          <Route
+            path="/resource"
+            exact
+            render={() => (
+              <Resource loading={loading} loggedin={loggedin} user={user} />
+            )}
+          />
+           <Route
+            path="/addresource"
+            exact
+            render={() => (
+              <AddResource loading={loading} loggedin={loggedin} user={user} />
             )}
           />
           <Route
@@ -418,7 +385,6 @@ function ResponsiveDrawer(props) {
               <UserType loading={loading} loggedin={loggedin} user={user} />
             )}
           />
-
           <Route
             path="/profile"
             exact
@@ -426,42 +392,19 @@ function ResponsiveDrawer(props) {
               <Profile loading={loading} loggedin={loggedin} user={user} />
             )}
           />
-          <Route
-            path="/staff"
-            exact
-            render={() => (
-              <Staff loading={loading} loggedin={loggedin} user={user} />
-            )}
-          />
-          <Route
-            path="/admin"
-            exact
-            render={() => (
-              <Admin loading={loading} loggedin={loggedin} user={user} />
-            )}
-          />
-          <Route
-            path="/attendance"
-            exact
-            render={() => (
-              <Attendance loading={loading} loggedin={loggedin} user={user} />
-            )}
-          />
-          <Route
-            path="/setattendance"
-            exact
-            render={() => (
-              <AttendanceDialog
-                loading={loading}
-                loggedin={loggedin}
-                user={user}
-              />
-            )}
-          />
+         
         </Switch>
       </div>
     </div>
   );
 }
+
+ResponsiveDrawer.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * You won't need it on your project.
+   */
+  window: PropTypes.func,
+};
 
 export default withRouter(ResponsiveDrawer);

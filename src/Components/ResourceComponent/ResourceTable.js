@@ -25,7 +25,7 @@ import theme from "../../theme";
 import { withStyles } from "@material-ui/core/styles";
 import { Search as SearchIcon } from "react-feather";
 import { toast } from "react-toastify";
-import { getStaffs } from "../../data/staffData";
+import Loader from "../../logo/fluid.gif";
 
 import firebase from "../../firebaseHandler";
 const db = firebase.firestore();
@@ -59,14 +59,15 @@ function stableSort(array, comparator) {
 const headCells = [
   { id: "name", label: "Name" },
   {
-    id: "inTime",
-    label: "In Time",
+    id: "cost",
+    label: "Cost",
   },
-  { id: "outTime", label: "Out Time" },
+  { id: "quantity", label: "Quantity" },
+  { id: "category", label: "Category" },
 ];
 
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, numSelected, rowCount } = props;
+  const { onSelectAllClick, numSelected, rowCount, user } = props;
 
   return (
     <TableHead>
@@ -99,15 +100,14 @@ function EnhancedTableHead(props) {
             {headCell.label}
           </TableCell>
         ))}
+        {user.userType === "Admin" ?
         <TableCell
-          align="center"
           style={{
             backgroundColor: "#f4f6f8",
             borderBottom: "none",
           }}
-        >
-          Status
-        </TableCell>
+        />
+        : null }
         <TableCell
           style={{
             backgroundColor: "#f4f6f8",
@@ -207,7 +207,7 @@ const EnhancedTableToolbar = (props) => {
               </InputAdornment>
             ),
           }}
-          placeholder="Search staff"
+          placeholder="Search Resource"
           variant="outlined"
         />
       )}
@@ -271,84 +271,41 @@ function EnhancedTable(props) {
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [staffs, setStaffs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [attendances, setAttendance] = useState([]);
+  const [categories, setCategory] = useState([]);
+  const [resources, setResource] = useState([]);
   const [edit, setEdit] = useState(true);
 
-  const getlist = async () => {
-    try {
-      setLoading(true);
-      const list = await getStaffs();
-      setStaffs(list);
-      setLoading(false);
-    } catch (error) {
-      console.log(error.message);
-      setLoading(false);
-    }
+
+  const handleDelete = (row) => {
+       db.collection("resource")
+       .doc(row.id)
+        .delete();
+        getResourceAdded()
+
   };
 
-  useEffect(() => {
-    getlist();
-  }, []);
-
-  const handlehistory = (row) => {
-    db.collection("attendance")
-      .where("uid", "==", user.uid, "&&")
-      .where("datePosted", "==", newDate)
-      .where("firstname", "==", row.firstname)
+  const getResourceAdded = () => {
+    db.collection("resource")
       .get()
       .then((querySnapshot) => {
-        let attendance = [];
-        querySnapshot.forEach((doc) => {
-          let obj = doc.data().outTime;
-          attendance.push(obj);
-        });
-        console.log("Got added attendance", attendance);
-        var inTime = attendance.toString();
-        console.log(inTime.length);
-        if (inTime.length === 0) {
-          history.push({
-            pathname: "/setattendance",
-            state: { staffDetails: row, edit },
-          });
-        } else {
-          toast.info("attendance already given");
-        }
-      });
-    setEdit(true);
-  };
-
-  var myTimestamp = firebase.firestore.Timestamp.fromDate(new Date()).toDate();
-  var today = myTimestamp;
-  const date =
-    today.getDate() + "-" + today.getMonth() + "-" + today.getFullYear();
-  const newDate = date.toString();
-
-  const getAttendanceAdded = () => {
-    db.collection("attendance")
-      .where("uid", "==", user.uid, "&&")
-      .where("datePosted", "==", newDate)
-      .get()
-      .then((querySnapshot) => {
-        let attendance = [];
+        let resource = [];
         querySnapshot.forEach((doc) => {
           let obj = doc.data();
           obj.id = doc.id;
-          attendance.push(obj);
+          resource.push(obj);
         });
-        console.log("Got added attendance", attendance);
-        setAttendance(attendance);
+        console.log("Got added resource", resource);
+        setResource(resource);
       })
       .catch((error) => {
-        console.log("Error getting added feedback: ", error);
+        console.log("Error getting added resource: ", error);
       });
   };
   useEffect(() => {
-    getAttendanceAdded();
+    getResourceAdded()
   }, []);
-  console.log(attendances);
-  const rows = attendances;
+  console.log(resources);
+  const rows = resources;
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -420,6 +377,7 @@ function EnhancedTable(props) {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
+                user = {user}
               />
               <TableBody>
                 {stableSort(rows, getComparator(order, orderBy))
@@ -458,90 +416,62 @@ function EnhancedTable(props) {
                           padding="none"
                           style={{ borderBottom: "none", paddingLeft: "24px" }}
                         >
-                          {row.firstname} {row.lastname}
+                          {row.name} 
                         </TableCell>
-                        <TableCell style={{ borderBottom: "none" }}>
-                          {row.inTime}
-                        </TableCell>
-                        <TableCell style={{ borderBottom: "none" }}>
-                          {row.outTime}
-                        </TableCell>
-
                         <TableCell
-                          align="center"
-                          style={{ borderBottom: "none" }}
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                          style={{ borderBottom: "none", paddingLeft: "24px" }}
                         >
-                          {row.status === "Present" ? (
-                            <span
-                              style={{
-                                fontWeight: 700,
-                                backgroundColor: "rgba(84, 214, 44, 0.16)",
-                                color: "rgb(34, 154, 22)",
-                                padding: "8px 15px",
-                                borderRadius: "16px",
-                              }}
+                          {row.cost} 
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                          style={{ borderBottom: "none", paddingLeft: "24px" }}
+                        >
+                          {row.quantity} 
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                          style={{ borderBottom: "none", paddingLeft: "24px" }}
+                        >
+                          {row.cat} 
+                        </TableCell>
+                        {user.userType === "Admin" ? 
+                        <>
+                        <TableCell style={{ borderBottom: "none" }}>
+                        <Button
+                              color="secondary"
+                              variant="contained"
+                              onClick={() => history.push({
+                                pathname: "/addresource",
+                                state: { resourceDetails: row},
+                              })}
                             >
-                              {row.status}
-                            </span>
-                          ) : null}
-                          {row.status === "Absent" ? (
-                            <span
-                              style={{
-                                fontWeight: 700,
-                                backgroundColor: "rgba(255, 72, 66, 0.16)",
-                                color: "rgb(183, 33, 54)",
-                                padding: "8px 15px",
-                                borderRadius: "16px",
-                              }}
-                            >
-                              {row.status}
-                            </span>
-                          ) : null}
-                          {row.status === "Leave" ? (
-                            <span
-                              style={{
-                                fontWeight: 700,
-                                backgroundColor: "rgba(48, 80, 255, 0.16)",
-                                color: "rgb(33, 78, 214)",
-                                padding: "5px 10px",
-                                borderRadius: "16px",
-                              }}
-                            >
-                              {row.status}
-                            </span>
-                          ) : null}
+                              Edit Resource
+                            </Button>
                         </TableCell>
                         <TableCell style={{ borderBottom: "none" }}>
-                          {row.status === "Leave" ? (
-                            <Button
+                        <Button
                               color="secondary"
                               variant="contained"
-                              disabled
-                              onClick={() => handlehistory(row)}
+                              onClick={() => handleDelete(row)}
                             >
-                              Set Out Time
+                              Delete Resource
                             </Button>
-                          ) : null}
-                          {row.status === "Absent" ? (
-                            <Button
-                              color="secondary"
-                              variant="contained"
-                              disabled
-                              onClick={() => handlehistory(row)}
-                            >
-                              Set Out Time
-                            </Button>
-                          ) : null}
-                          {row.status === "Present" ? (
-                            <Button
-                              color="secondary"
-                              variant="contained"
-                              onClick={() => handlehistory(row)}
-                            >
-                              Set Out Time
-                            </Button>
-                          ) : null}
                         </TableCell>
+                        </>
+                        :
+                        null }
+                        
                       </TableRow>
                     );
                   })}
@@ -559,16 +489,15 @@ function EnhancedTable(props) {
           />
         </Paper>
       ) : (
-        <Typography
-          style={{
-            width: "100%",
-            padding: "30px",
-            textAlign: "center",
-            fontSize: "25px",
-          }}
-        >
-          Todays Attendance has not Started
-        </Typography>
+        <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <img src={Loader} style={{ width: "200px" }} alt="loader" />
+          </div>
       )}
     </div>
   );

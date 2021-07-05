@@ -6,7 +6,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import { setAuth, saveUserData } from "./redux/actions";
 import firebase from "./firebaseHandler";
-import Loader from "./logo/loader.gif";
+import Loader from "./logo/fluid.gif";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,10 +15,10 @@ const db = firebase.firestore();
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#00ab55",
+      main: "rgb(106, 56, 255)",
     },
     secondary: {
-      main: "#00ab55",
+      main: "rgb(106, 56, 255)",
     },
   },
 });

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useEffect, useState } from "react";
 import { withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
@@ -23,10 +24,10 @@ import { TextField, InputAdornment, SvgIcon, Button } from "@material-ui/core";
 import theme from "../../theme";
 import { withStyles } from "@material-ui/core/styles";
 import { Search as SearchIcon } from "react-feather";
+import Loader from "../../logo/fluid.gif";
 import { toast } from "react-toastify";
+
 import firebase from "../../firebaseHandler";
-import { getStaffs, addStaff, updateStaff } from "../../data/staffData";
-import StaffDialog from "./StaffDialog";
 const db = firebase.firestore();
 
 function descendingComparator(a, b, orderBy) {
@@ -56,16 +57,11 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: "name", numeric: false, disablePadding: true, label: "Name" },
+  { id: "name", label: "Name" },
   {
-    id: "department",
-    numeric: true,
-    disablePadding: false,
-    label: "Department",
+    id: "editAction",
+    label: "Edit Action",
   },
-  { id: "role", numeric: true, disablePadding: false, label: "Role" },
-  { id: "gender", numeric: true, disablePadding: false, label: "Gender" },
-  { id: "phone", numeric: true, disablePadding: false, label: "Phone" },
 ];
 
 function EnhancedTableHead(props) {
@@ -110,7 +106,9 @@ function EnhancedTableHead(props) {
             paddingRight: "24px",
             boxShadow: "#fff -8px 0px 0px inset",
           }}
-        />
+        >
+          Delete Action
+        </TableCell>
       </TableRow>
     </TableHead>
   );
@@ -201,7 +199,7 @@ const EnhancedTableToolbar = (props) => {
               </InputAdornment>
             ),
           }}
-          placeholder="Search staff"
+          placeholder="Search Category"
           variant="outlined"
         />
       )}
@@ -265,127 +263,40 @@ function EnhancedTable(props) {
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [staffs, setStaffs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [formMode, setFormMode] = useState(true);
-  const [staffId, setStaffId] = useState("");
-  const [firstname, setFirstName] = useState("");
-  const [lastname, setLastName] = useState("");
-  const [phonenumber, setPhoneNumber] = useState("");
-  const [gender, setGender] = useState("");
-  const [department, setDepartment] = useState("");
-  const [role, setRole] = useState("");
+  const [categories, setCategory] = useState([]);
+  const [edit, setEdit] = useState(true);
 
-  var myTimestamp = firebase.firestore.Timestamp.fromDate(new Date()).toDate();
-  var today = myTimestamp;
-  const date =
-    today.getDate() + "-" + today.getMonth() + "-" + today.getFullYear();
-  const newDate = date.toString();
 
-  const handleSetIn = (row) => {
-    db.collection("attendance")
-      .where("uid", "==", user.uid, "&&")
-      .where("datePosted", "==", newDate)
-      .where("firstname", "==", row.firstname)
+  const handleDelete = (row) => {
+       db.collection("category")
+       .doc(row.id)
+        .delete();
+        getCategoryAdded()
+
+  };
+
+  const getCategoryAdded = () => {
+    db.collection("category")
       .get()
       .then((querySnapshot) => {
-        let attendance = [];
+        let category = [];
         querySnapshot.forEach((doc) => {
-          let obj = doc.data().inTime;
-          attendance.push(obj);
+          let obj = doc.data();
+          obj.id = doc.id;
+          category.push(obj);
         });
-        console.log("Got added attendance", attendance);
-        console.log(attendance);
-        if (attendance.length === 1) {
-          toast.info("Attendance already given");
-        } else {
-          history.push({
-            pathname: "/setattendance",
-            state: { staffDetails: row },
-          });
-        }
+        console.log("Got added category", category);
+        setCategory(category);
+      })
+      .catch((error) => {
+        console.log("Error getting added category: ", error);
       });
   };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleFirstName = (event) => {
-    setFirstName(event.target.value);
-  };
-  const handleLastName = (event) => {
-    setLastName(event.target.value);
-  };
-  const handlePhoneNumber = (event) => {
-    setPhoneNumber(event.target.value);
-  };
-  const handleGender = (event) => {
-    setGender(event.target.value);
-  };
-  const handleDepartment = (event) => {
-    setDepartment(event.target.value);
-  };
-  const handleRole = (event) => {
-    setRole(event.target.value);
-  };
-
-  const getlist = async () => {
-    try {
-      setLoading(true);
-      const list = await getStaffs(user);
-      setStaffs(list);
-      setLoading(false);
-    } catch (error) {
-      console.log(error.message);
-      setLoading(false);
-    }
-  };
-
-  const addStaffHandler = async () => {
-    try {
-      const staff = {
-        firstname,
-        lastname,
-        phonenumber,
-        gender,
-        department,
-        role,
-      };
-      if (formMode) {
-        await addStaff(staff);
-        toast.success("Staff Added Successfully");
-        getlist();
-        setOpen(false);
-        setFirstName("");
-        setLastName("");
-        setPhoneNumber("");
-        setGender("");
-        setDepartment("");
-        setRole("");
-      } else {
-        await updateStaff(staffId, staff);
-        toast.success("Staff Updated Successfully");
-        getlist();
-        setOpen(false);
-        setFirstName("");
-        setLastName("");
-        setPhoneNumber("");
-        setGender("");
-        setDepartment("");
-        setRole("");
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
   useEffect(() => {
-    getlist();
+    getCategoryAdded()
   }, []);
-
-  const rows = staffs;
-  console.log(rows);
+  console.log(categories);
+  const rows = categories;
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -437,120 +348,114 @@ function EnhancedTable(props) {
     if (!loggedin) {
       props.history.push("/");
     }
-  }, [loggedin]);
+  }, []);
   return (
     <div className={classes.root}>
-      <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table
-            className={classes.table}
-            aria-labelledby="tableTitle"
-            aria-label="enhanced table"
-          >
-            <EnhancedTableHead
-              classes={classes}
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  const isItemSelected = isSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+      {rows && rows.length > 0 ? (
+        <Paper className={classes.paper}>
+          <EnhancedTableToolbar numSelected={selected.length} />
+          <TableContainer>
+            <Table
+              className={classes.table}
+              aria-labelledby="tableTitle"
+              aria-label="enhanced table"
+            >
+              <EnhancedTableHead
+                classes={classes}
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onSelectAllClick={handleSelectAllClick}
+                onRequestSort={handleRequestSort}
+                rowCount={rows.length}
+              />
+              <TableBody>
+                {stableSort(rows, getComparator(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row, index) => {
+                    const isItemSelected = isSelected(row.id);
+                    const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                      style={{
-                        outline: "none",
-                        height: "70px",
-                      }}
-                    >
-                      <TableCell
-                        padding="checkbox"
-                        style={{ borderBottom: "none", paddingLeft: "24px" }}
+                    return (
+                      <TableRow
+                        hover
+                        onClick={(event) => handleClick(event, row.id)}
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.id}
+                        selected={isItemSelected}
+                        style={{
+                          outline: "none",
+                          height: "70px",
+                        }}
                       >
-                        <Checkbox
-                          checked={isItemSelected}
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
-                        style={{ borderBottom: "none", paddingLeft: "24px" }}
-                      >
-                        {row.firstname} {row.lastname}
-                      </TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>
-                        {row.department}
-                      </TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>
-                        {row.role}
-                      </TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>
-                        {row.gender}
-                      </TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>
-                        {row.phonenumber}
-                      </TableCell>
-                      <TableCell style={{ borderBottom: "none" }}>
-                        <Button
-                          color="secondary"
-                          variant="contained"
-                          onClick={() => handleSetIn(row)}
+                        <TableCell
+                          padding="checkbox"
+                          style={{ borderBottom: "none", paddingLeft: "24px" }}
                         >
-                          Set In Time
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-          <StaffDialog
-            open={open}
-            close={handleClose}
-            formmode={formMode}
-            firstname={firstname}
-            lastname={lastname}
-            phonenumber={phonenumber}
-            gender={gender}
-            department={department}
-            role={role}
-            changeFirstname={handleFirstName}
-            changeLastname={handleLastName}
-            changePhoneNumber={handlePhoneNumber}
-            changeGender={handleGender}
-            changeDepartment={handleDepartment}
-            changeRole={handleRole}
-            addStaff={addStaffHandler}
+                          <Checkbox
+                            checked={isItemSelected}
+                            inputProps={{ "aria-labelledby": labelId }}
+                          />
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                          style={{ borderBottom: "none", paddingLeft: "24px" }}
+                        >
+                          {row.name} 
+                        </TableCell>
+                        <TableCell style={{ borderBottom: "none" }}>
+                        <Button
+                              color="secondary"
+                              variant="contained"
+                              onClick={() => history.push({
+                                pathname: "/addcategory",
+                                state: { categoryDetails: row},
+                              })}
+                            >
+                              Edit Category
+                            </Button>
+                        </TableCell>
+                        <TableCell style={{ borderBottom: "none" }}>
+                        <Button
+                              color="secondary"
+                              variant="contained"
+                              onClick={() => handleDelete(row)}
+                            >
+                              Delete Category
+                            </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
           />
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-        />
-      </Paper>
+        </Paper>
+      ) : (
+        <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <img src={Loader} style={{ width: "200px" }} alt="loader" />
+      </div>
+      )}
     </div>
   );
 }

@@ -4,18 +4,40 @@ import firebase from "../firebaseHandler";
 import { useSelector, useDispatch } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { saveUserData } from "../redux/actions";
+import Logo from "../logo/logo.png";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import IconButton from "@material-ui/core/IconButton";
+import { toast } from "react-toastify";
+import { setAuth } from "../redux/actions";
+import Typography from "@material-ui/core/Typography";
 const db = firebase.firestore();
 
-const allUserTypes = ["Admin"];
+const allUserTypes = ["Assistant","Professor","Maintenance"];
 
 const UserType = (props) => {
   const { history } = props;
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.userData);
   const [userType, setUserType] = useState(
-    user && user.userType ? user.userType : "Admin"
+    user && user.userType ? user.userType : "Assistant"
   );
 
+  const singOutUser = () => {
+    toast.success("Log Out Successful");
+    firebase
+      .auth()
+      .signOut()
+      .then(async () => {
+        await localStorage.clear();
+        dispatch(setAuth(false));
+        dispatch(saveUserData(null));
+        // history.push("/");
+        window.location.reload();
+      })
+      .catch(function (error) {
+        // An error happened.
+      });
+  };
   const handleUserTypeChange = () => {
     if (user) {
       db.collection("users")
@@ -34,6 +56,7 @@ const UserType = (props) => {
           newUser.userType = userType;
           dispatch(saveUserData(newUser));
           history.push("/profile");
+          window.location.reload();
         })
         .catch((err) => {
           console.log("Could not change user-type", err);
@@ -48,13 +71,37 @@ const UserType = (props) => {
   }, []);
 
   return (
+    <>
+    { user && user.userType !== "Assistant" && user.userType !== "Admin" && user.userType !== "HOD" && user.userType !== "Professor" && user.userType !== "Maintenance" &&
     <div
       style={{
         width: "100%",
+        height:'90vh',
+        display:'flex',
+        flexDirection:'column',
+        justifyContent:'center',
+        alignItems:'center'
       }}
     >
-      <p style={{ fontSize: 30, marginBottom: 30 }}>Help us know you better.</p>
-      <p style={{ fontSize: 15 }}>Who are you?</p>
+      <div style={{width:'100%',top:0,position:'absolute',height:'90px',display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+      <Typography
+                  style={{
+                    fontWeight: "700",
+                    fontSize: "20px",
+                    paddingLeft: "5px",
+                    color: "rgb(106, 56, 255)",
+                    paddingLeft:'20px'
+                  }}
+                >
+                  RMS
+                </Typography>
+       <IconButton>
+            <ExitToAppIcon onClick={singOutUser} />
+        </IconButton>
+      </div>
+
+      <p style={{ fontSize: 30, marginBottom: 30 }}>Set your user type</p>
+      <p style={{ fontSize: 16, marginBottom: 30 }}>Let us know you better</p>
       <Select
         labelId="userType-select-label"
         id="userType-select"
@@ -77,6 +124,8 @@ const UserType = (props) => {
         Save
       </Button>
     </div>
+  }
+  </>
   );
 };
 

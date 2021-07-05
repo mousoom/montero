@@ -2,7 +2,7 @@ import { Box } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 
-const AdminListToolbar = (props) => {
+const UserToolbar = (props) => {
   return (
     <Box {...props}>
       <Box
@@ -21,7 +21,7 @@ const AdminListToolbar = (props) => {
               marginBottom: "8px",
             }}
           >
-            Admin List
+            User List
           </Box>
           <Breadcrumbs
             separator={
@@ -39,8 +39,8 @@ const AdminListToolbar = (props) => {
             style={{ lineHeight: "2", fontSize: "1rem" }}
           >
             <Typography style={{ color: "black" }}>Dashboard</Typography>
-            <Typography style={{ color: "black" }}>Supervisor</Typography>
-            <Typography>Admin List</Typography>
+            <Typography style={{ color: "black" }}>Admin</Typography>
+            <Typography>User List</Typography>
           </Breadcrumbs>
         </Box>
       </Box>
@@ -48,4 +48,4 @@ const AdminListToolbar = (props) => {
   );
 };
 
-export default AdminListToolbar;
+export default UserToolbar;
